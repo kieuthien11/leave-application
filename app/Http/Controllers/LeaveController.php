@@ -147,15 +147,37 @@ class LeaveController extends Controller
         }
         
         if ($status === 'approved') {
-            $leaveBlance = LeaveBalance::where('employee_id', $leave->employee_id)
-                ->first();
-            $totalLeave = $leaveBlance->remaining_days - 1;
-            if ($totalLeave <= 0) {
-                return response()->json(['message' => 'Ngày phép đã hết'], 422);
+             // Tính số ngày nghỉ
+            $start = Carbon::parse($leave->start_date);
+            $end = Carbon::parse($leave->end_date);
+
+            // Tính số ngày chênh lệch
+            $days = $start->diffInDays($end);
+
+            // Tính nửa ngày đầu
+            $startHalf = $leave->start_period === 'PM' ? 0.5 : 1;
+
+            // Tính nửa ngày cuối
+            $endHalf = $leave->end_period === 'AM' ? 0.5 : 1;
+
+            // Tổng ngày nghỉ
+            $totalLeaveDays = 0;
+            if ($start->equalTo($end)) {
+                // Cùng ngày
+                $totalLeaveDays = ($leave->start_period === $leave->end_period) ? 0.5 : 1;
+            } else {
+                $totalLeaveDays = ($days - 1) + $startHalf + $endHalf;
             }
-            LeaveBalance::where('employee_id', $leave->employee_id)->update([
-                'remaining_days' => $totalLeave
-            ]);
+
+            $leaveBalance = LeaveBalance::where('employee_id', $leave->employee_id)->first();
+
+            if (!$leaveBalance || $leaveBalance->remaining_days < $totalLeaveDays) {
+                return response()->json(['message' => 'Không đủ ngày phép'], 422);
+            }
+
+            // Trừ ngày phép
+            $leaveBalance->remaining_days -= $totalLeaveDays;
+            $leaveBalance->save();
         }
 
         $leave->status = $status;
