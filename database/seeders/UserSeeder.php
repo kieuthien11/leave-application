@@ -44,7 +44,7 @@ class UserSeeder extends Seeder
             'email' => 'staff@example.com',
             'password' => Hash::make('staff123'),
             'role' => 'staff',
-            'employee_id' => $employeeA->employee_id, // Gán employee_id cho người dùng
+            'employee_id' => $employeeA->id, // Gán employee_id cho người dùng
         ]);
 
         User::create([
@@ -52,7 +52,7 @@ class UserSeeder extends Seeder
             'email' => 'manager@example.com',
             'password' => Hash::make('manager123'),
             'role' => 'manager',
-            'employee_id' => $employeeB->employee_id, // Gán employee_id cho người dùng
+            'employee_id' => $employeeB->id, // Gán employee_id cho người dùng
         ]);
     }
 }
