@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\LeaveBalance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\LeaveType;
 
 class LeaveController extends Controller
 {
@@ -146,7 +147,7 @@ class LeaveController extends Controller
             return response()->json(['message' => 'Trạng thái không hợp lệ'], 422);
         }
         
-        if ($status === 'approved') {
+        if ($status === 'approved' && $leave->type === LeaveType::ANNUAL) {
              // Tính số ngày nghỉ
             $start = Carbon::parse($leave->start_date);
             $end = Carbon::parse($leave->end_date);

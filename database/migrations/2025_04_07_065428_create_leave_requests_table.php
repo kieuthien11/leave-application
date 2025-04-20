@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreign('employee_id')->references('id')->on('employees'); // Tham chiếu đúng cột employee_id
             $table->enum('type', [
                 LeaveType::ANNUAL,
-                LeaveType::SICK,
                 LeaveType::UNPAID,
                 LeaveType::MATERNITY,
             ])->default(LeaveType::ANNUAL);
